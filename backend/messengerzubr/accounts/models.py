@@ -9,7 +9,8 @@ class Account(models.Model):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     def __str__(self):
-        return self.user.username
+        return self.name if self.name else self.user.username
+
 
 # Сигнал для автоматического создания аккаунта при создании пользователя
 @receiver(post_save, sender=User)
@@ -21,3 +22,4 @@ def create_user_account(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_account(sender, instance, **kwargs):
     instance.account.save()
+

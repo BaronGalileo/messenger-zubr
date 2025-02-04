@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import Account
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 
@@ -29,3 +30,17 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+class AccountSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Account
+        fields = ['id', 'user', 'name', 'avatar']
+
+    def update(self, instance, validated_data):
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.save()
+        return instance
