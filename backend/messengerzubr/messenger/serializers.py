@@ -30,6 +30,9 @@ class ConversationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Only the creator can modify the conversation.")
         return data
 
+
+
+
 class MessageStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = MessageStatus

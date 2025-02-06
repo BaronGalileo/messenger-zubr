@@ -13,6 +13,7 @@ class Conversation(models.Model):
     conversation_type = models.CharField(max_length=10, choices=CONVERSATION_TYPES, default=PRIVATE)
     name = models.CharField(max_length=255, blank=True, null=True)
     participants = models.ManyToManyField(Account, related_name='conversations')
+    creator = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='created_conversations')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -26,7 +27,7 @@ class Message(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Message {self.id} from {self.sender.username}"
+        return f"Message {self.id} from {self.sender.name}"
 
 class MessageStatus(models.Model):
     message = models.ForeignKey(Message, related_name='statuses', on_delete=models.CASCADE)
@@ -35,4 +36,4 @@ class MessageStatus(models.Model):
     read_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"MessageStatus {self.id} for {self.user.username} (Read: {self.is_read})"
+        return f"Сообщение {self.id} for {self.user.name} (Прочтено: {self.is_read})"
