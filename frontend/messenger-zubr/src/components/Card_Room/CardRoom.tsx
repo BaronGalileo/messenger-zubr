@@ -17,7 +17,7 @@ export const CardRoom = () => {
                     время создания
                 </div>
                 <div className="card-noread">
-                    непрочтенные сообщения
+                    непрочтенные сообщения, кол-во
                 </div>
             </div>
         </div>
