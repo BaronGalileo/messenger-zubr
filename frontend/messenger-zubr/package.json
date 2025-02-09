@@ -3,9 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
+    "axios": "^1.7.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-scripts": "5.0.1"
+    "react-hook-form": "^7.54.2",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.1.5",
+    "react-scripts": "5.0.1",
+    "sass": "^1.84.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -33,11 +39,11 @@
   },
   "devDependencies": {
     "@testing-library/react": "^16.2.0",
-    "cra-template-typescript": "1.2.0",
+    "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "web-vitals": "^4.2.4",
-    "typescript": "^5",
-    "@types/node": "^20"
+    "cra-template-typescript": "1.2.0",
+    "typescript": "^4.9.5",
+    "web-vitals": "^4.2.4"
   }
 }
