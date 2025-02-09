@@ -3,26 +3,26 @@ backend/venv/
 .env/
 
 #frontend игнор
-frontend/node_modules
-frontend/.pnp
-frontend/.pnp.js
+frontend/messenger-zubr/node_modules
+frontend/messenger-zubr/.pnp
+frontend/messenger-zubr/.pnp.js
 
 # testing
-frontend/coverage
+frontend/messenger-zubr/coverage
 
 # production
-frontend/build
+frontend/messenger-zubr/build
 
 # misc
-frontend/.DS_Store
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
+frontend/messenger-zubr/.DS_Store
+frontend/messenger-zubr/.env.local
+frontend/messenger-zubr/.env.development.local
+frontend/messenger-zubr/.env.test.local
+frontend/messenger-zubr/.env.production.local
 
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
+frontend/messenger-zubr/npm-debug.log*
+frontend/messenger-zubr/yarn-debug.log*
+frontend/messenger-zubr/yarn-error.log*
 
 # Игнорировать кэш Python
 __pycache__/
