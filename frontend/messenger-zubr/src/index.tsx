@@ -10,6 +10,9 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <BrowserRouter>
+  <div>
+    <h1>Проверка</h1>
+    </div>
     <App/>
   </BrowserRouter>
   // </React.StrictMode>
