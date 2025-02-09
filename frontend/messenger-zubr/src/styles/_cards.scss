@@ -1,0 +1,37 @@
+@use 'variables' as v;
+@use 'mixins' as m;
+
+.card-room {
+
+    &,
+    &-wrapper,
+    &-avatar,
+    &-name-contex,
+    &-time-noread {
+        margin: 3px;
+    }
+
+    &-wrapper {
+        @include m.border(15px, 2px, solid, v.$main__color_4);
+        @include m.d-flex(space-between);
+        margin: 5px;
+        height: 120px;
+    }
+
+    &-avatar {
+        width: min(120px, 20%); // Ограничение размера
+        aspect-ratio: 1 / 1; // Всегда квадратный
+        @include m.border(50%);
+        @include m.d-flex(center, center);
+    }
+
+    &-name-contex {
+        @include m.d-flex(space-around, center, column);
+        width: min(300px, 70%); // Ограничение размера
+    }
+
+    &-time-noread {
+        width: min(100px, 7%); // Ограничение размера
+        @include m.d-flex(center, center, column);
+    }
+}

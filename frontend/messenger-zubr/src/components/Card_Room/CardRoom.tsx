@@ -4,7 +4,7 @@ export const CardRoom = () => {
             <div className="card-room-avatar">
                 картинка
             </div>
-            <div className="card-room-name_contex">
+            <div className="card-room-name-contex">
                 <div className="card-name">
                     Наименование
                 </div>
@@ -12,7 +12,7 @@ export const CardRoom = () => {
                     содержание
                 </div>
             </div>
-            <div className="card-room-time_noread">
+            <div className="card-room-time-noread">
                 <div className="card-time">
                     время создания
                 </div>

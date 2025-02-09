@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './components/App';
 import { BrowserRouter } from 'react-router-dom';
+import "./styles/index.scss";
 
 
 const root = ReactDOM.createRoot(
@@ -10,9 +11,6 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <BrowserRouter>
-  <div>
-    <h1>Проверка</h1>
-    </div>
     <App/>
   </BrowserRouter>
   // </React.StrictMode>
