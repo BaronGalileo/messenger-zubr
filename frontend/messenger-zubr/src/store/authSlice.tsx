@@ -1,10 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import { AuthState, AuthPayload } from "../types/auth"
+import { AuthState } from "../types/auth"
 
 
 const initialState:AuthState = {
     username: null,
-    auth_token:  null,
+    refresh: null,
+    access:  null,
     isAuth: false,
     confermAut: null,
 }
@@ -15,15 +16,17 @@ const authSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        setAuth(state, action: PayloadAction<AuthPayload>) {
+        setAuth(state, action: PayloadAction<AuthState>) {
             state.username = action.payload.username;
-            state.auth_token = action.payload.auth_token;
+            state.refresh = action.payload.refresh;
+            state.access = action.payload.access;
             state.isAuth = true;
             state.confermAut = action.payload.confermAut;
         },
         removeAuth(state) {
             state.username = null;
-            state.auth_token = null;
+            state.refresh = null;
+            state.access = null;
             state.isAuth = false;
             state.confermAut = null;
         }

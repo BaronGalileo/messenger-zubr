@@ -1,7 +1,8 @@
 export interface AuthState {
     username: string | null;
-    auth_token: string | null;
+    access: string | null;
     isAuth: boolean;
+    refresh: string | null;
     confermAut: {
       headers: {
         Authorization: string;
@@ -9,12 +10,3 @@ export interface AuthState {
     } | null;
   }
   
-  export interface AuthPayload {
-    username: string;
-    auth_token: string;
-    confermAut: {
-      headers: {
-        Authorization: string;
-      };
-    };
-  }
