@@ -3,6 +3,7 @@ backend/venv/
 .env/
 
 #frontend игнор
+.vscode/
 frontend/messenger-zubr/node_modules
 frontend/messenger-zubr/.pnp
 frontend/messenger-zubr/.pnp.js
