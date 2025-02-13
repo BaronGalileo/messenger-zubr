@@ -10,7 +10,6 @@ export async function refreshTokenIfNeeded() {
   
     if (refreshToken) {
       try {
-        debugger
         const res = await axios.post<{ access: string }>(
           `${API_URL}api/token/refresh/`,
           { refresh: refreshToken }

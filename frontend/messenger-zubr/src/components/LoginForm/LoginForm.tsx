@@ -16,8 +16,6 @@ import { api } from "../../services/api";
 
 export const LoginForm = () => {
 
-    const [message, setMessage] = useState("");
-
     const isAuth = useSelector((state: RootState) => state.auth);
     const dispatch: AppDispatch = useDispatch();
 
@@ -71,95 +69,6 @@ export const LoginForm = () => {
 
     const show = () => {
         console.log("SHOW", isAuth )
-        // const token = isAuth.access;
-        // const socket = new WebSocket(`ws://localhost:8000/ws/messages/3/?token=${token}`);
-
-        // socket.onopen = () => {
-        //     console.log("WebSocket connection opened");
-        // };
-        // // socket.onopen = () => {
-        // //     console.log("OPEN", isAuth.access);
-        // //     socket.send(JSON.stringify({
-        // //         "token": isAuth.access
-        // //     }));
-        
-        // socket.onerror = (error) => {
-        //     console.log("WebSocket Error: ", error);
-        // };
-        
-        // socket.onclose = (event) => {
-        //     console.log("WebSocket Closed: ", event);
-        // };
-        // const my_array = [2,4,7,3,5,9,11,0]
-        // let max_max = my_array[0] > my_array[1] ? my_array[0] : my_array[1]
-        // let max_2 = max_max === my_array[1] ? my_array[0] : my_array[1]
-        // for(let i = 2; i <my_array.length; i++) {
-        //     if(my_array[i] > max_2 && my_array[i] < max_max){
-        //         max_2 = my_array[i]
-        //     }
-        //     else if(my_array[i] > max_2 && my_array[i] > max_max){
-        //         max_2 = max_max
-        //         max_max = my_array[i]
-        //     }
-
-        // }
-        // console.log("max_max", max_max)
-        // console.log("max_2", max_2)
-
-        // interface Imap {
-        //     id: number,
-        //     name: string,
-        //     age?: number
-            
-        // }
-
-        // const my_map:Imap[] = [
-        //     {id: 1, name: "Иванов"},
-        //     {id: 2, name: "Петров"},
-        //     {id: 3, name: "Сидоров"},
-        //     {id: 4, name: "Сергеев"},
-        //     {id: 5, name: "Васильев"},
-        // ]
-
-        // let new_map = my_map.map(i => {
-        //     let rondom_age = Math.floor(Math.random() * (80 - 20 + 1)) + 20;
-        //     i.age = rondom_age;
-        //     return i;
-        // });
-        // console.log(new_map)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // for(let i = 0; i < my_array.length; i++){
-        //     let j = my_array[i+1] ? my_array[i+1] : 0;
-        //     console.log("i", i)
-        //     console.log("j", j)
-        //     console.log("my_array[i]", my_array[i])
-        // }
     }
 
     const del = () => {
