@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+
+    'channels',
     'rest_framework',
     'accounts',
     'messenger',
@@ -75,7 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'messengerzubr.wsgi.application'
-
+ASGI_APPLICATION = 'messengerzubr.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -142,3 +145,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Фронтенд на React
     "https://example.com",  # Продакшен-домен
 ]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
