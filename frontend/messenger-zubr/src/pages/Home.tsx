@@ -1,5 +1,6 @@
 import { CardRoom } from "../components/Card_Room/CardRoom"
 import { LoginForm } from "../components/LoginForm/LoginForm"
+import { TestChat } from "../components/testComponents/testChat"
 
 const HomePage = () => {
     return (
@@ -8,6 +9,7 @@ const HomePage = () => {
             <CardRoom/>
             <CardRoom/>
             <CardRoom/>
+            <TestChat/>
         </div>
     )
 }

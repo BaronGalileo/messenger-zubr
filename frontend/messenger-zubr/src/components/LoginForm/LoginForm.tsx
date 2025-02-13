@@ -67,122 +67,9 @@ export const LoginForm = () => {
         })
     }
 
-    let socket = useRef<WebSocket | null>(null);
 
-    async function createWebSocketConnection() {
-        if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-            console.log("WebSocket already connected, skipping new connection.");
-            return;
-        }
-
-        let token = store.getState().auth.access;
-
-        if (!token) {
-            console.log("Access token is missing, trying to refresh...");
-            token = await refreshTokenIfNeeded();
-            if (!token) {
-                console.error("Failed to obtain a valid token, aborting WebSocket connection");
-                return;
-            }
-        }
-
-    console.log("Using token for WebSocket:", token);
-
-    socket.current = new WebSocket(`ws://localhost:8000/ws/messages/3/?token=${token}`);
-
-    socket.current.onopen = () => {
-        console.log("WebSocket Connected");
-    };
-
-    socket.current.onmessage = (event) => {
-        console.log("Message from server: ", event.data);
-
-    };
-
-    socket.current.onerror = (error) => {
-        console.log("WebSocket Error: ", error);
-    };
-
-    socket.current.onclose = async (event) => {
-        console.log("WebSocket Disconnected", event.code);
-        socket.current = null; // Очистим переменную при отключении
-
-        if (event.code === 1006 || event.code === 4001) {
-            console.log("Token might be invalid, attempting to refresh...");
-            const newToken = await refreshTokenIfNeeded();
-
-            if (newToken) {
-                console.log("Reconnecting WebSocket with new token");
-                setTimeout(createWebSocketConnection, 1000);
-            } else {
-                console.log("No valid token available for reconnection");
-            }
-        }
-    };
-
-    }
-
-    const sendMessage = () => {
-        if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-            socket.current.send(JSON.stringify({ message }));
-            console.log("Отправлено: ", message);
-            setMessage(""); // Очищаем поле ввода после отправки
-        } else {
-            console.error("WebSocket не подключен.");
-        }
-    };
-
-
-
-    // async function createWebSocketConnection() {
-    //     debugger
-    //     let token = isAuth.access; // Берем текущий access токен
-      
-    //     if (!token) {
-    //       // Если токен отсутствует, пытаемся обновить его
-    //       token = await refreshTokenIfNeeded();
-    //     }
-      
-    //     if (token) {
-    //       // Если токен есть, создаем WebSocket соединение с token в URL
-    //       const socket = new WebSocket(`ws://localhost:8000/ws/messages/3/?token=${token}`);
-      
-    //       socket.onopen = () => {
-    //         console.log("WebSocket Connected");
-    //       };
-      
-    //       socket.onmessage = (event) => {
-    //         console.log("Message from server: ", event.data);
-    //       };
-      
-    //       socket.onerror = (error) => {
-    //         console.log("WebSocket Error: ", error);
-    //       };
-      
-    //       socket.onclose = async () => {
-    //         console.log("WebSocket Disconnected");
-    //         // Попробуем обновить токен, если соединение закрыто по причине 401 или ошибки авторизации
-    //         const newToken = await refreshTokenIfNeeded();
-    //         debugger
-    //         if (newToken) {
-    //             console.log("Reconnecting WebSocket with new token");
-    //             setTimeout(() => {
-    //               createWebSocketConnection(); // Попробуем переподключиться с новым токеном
-    //             }, 1000); // Добавляем задержку для повторного подключения
-    //           } else {
-    //             console.log("No valid token available for reconnection");
-    //           }
-    //         };
-      
-    //       return socket;
-    //     } else {
-    //       console.error("No valid token available for WebSocket connection");
-    //       return null;
-    //     }
-    //   }
 
     const show = () => {
-        createWebSocketConnection()
         console.log("SHOW", isAuth )
         // const token = isAuth.access;
         // const socket = new WebSocket(`ws://localhost:8000/ws/messages/3/?token=${token}`);
@@ -307,13 +194,6 @@ export const LoginForm = () => {
             <button onClick={del} >Удалить</button>
             <button onClick={post_request} >ЗАПРОСИТЬ</button>
             </div>
-            <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Введите сообщение"
-            />
-            <button onClick={sendMessage}>Отправить</button>
         </div>
         </>
     )
