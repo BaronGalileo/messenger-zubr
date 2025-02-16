@@ -18,10 +18,18 @@ interface Invitation {
 }
 
 export function useWebSocket(roomId: number) {
+
     const [isConnected, setIsConnected] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [invitations, setInvitations] = useState<Invitation[]>([]);
+    const [hasMoreMessages, setHasMoreMessages] = useState(true); // Флаг наличия старых сообщений
+    const isLoadingMore = useRef(false); // Флаг загрузки
     const socketRef = useRef<WebSocket | null>(null);
+
+
+    useEffect(() => {
+
+    }, [])
 
     const connectWebSocket = async () => {
         if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
@@ -39,8 +47,6 @@ export function useWebSocket(roomId: number) {
                 return;
             }
         }
-
-        console.log("Используем токен для WebSocket:", token);
         socketRef.current = new WebSocket(`ws://localhost:8000/ws/messages/${roomId}/?token=${token}`);
 
         socketRef.current.onopen = () => {
@@ -52,15 +58,26 @@ export function useWebSocket(roomId: number) {
         socketRef.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log("📩 Сообщение от сервера:", data);
-            
-            if (data.action === "new_message") {
+
+            if (data.action === "initial_messages") {
+                console.log("📜 Загружены последние сообщения:", data.messages);
+                setMessages((prev) => [...data.messages, ...prev]);          
+            } else if (data.action === "new_message") {
                 console.log("🆕 Новое сообщение:", data.message);
                 setMessages((prev) => [...prev, data.message]); // Добавляем в state
             } else if (data.action === "invitation") {
                 console.log("📩 Приглашение в беседу:", data.conversation);
                 setInvitations((prev) => [...prev, data]); // Добавляем в state
-            } else if (data.action === "messages_read") { // ✅ Новый обработчик
+            } else if (data.action === "messages_read") { 
                 console.log(`👀 Сообщения в беседе ${data.conversation_id} прочитал пользователь ${data.read_by}`);
+            } else if (data.action === "load_more_messages") {
+                if (data.messages.length === 0) {
+                    setHasMoreMessages(false);
+                } else {
+                    console.log("⬆️ Загружены старые сообщения:", data.messages);
+                    setMessages((prev) => [...data.messages.reverse(), ...prev]);  // Добавляем в начало
+                }
+            isLoadingMore.current = false;
             }
         };
 
@@ -137,6 +154,24 @@ export function useWebSocket(roomId: number) {
         }
     };
 
+    const loadMoreMessages = () => {
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && hasMoreMessages && !isLoadingMore.current) {
+            isLoadingMore.current = true;
+            const lastMessageId = messages[0]?.id;
+            console.log(messages)
+            if (!lastMessageId) return;
+
+            const requestData = {
+                action: "load_more_messages",
+                last_message_id: lastMessageId,
+            };
+            socketRef.current.send(JSON.stringify(requestData));
+            console.log("⬆️ Запрос на загрузку старых сообщений:", requestData);
+        } else {
+            console.warn("⛔ WebSocket не подключен или все сообщения загружены.");
+        }
+    };
+
     useEffect(() => {
         return () => {
             disconnectWebSocket();
@@ -151,6 +186,8 @@ export function useWebSocket(roomId: number) {
         disconnectWebSocket, 
         messages, 
         invitations,
-        markMessagesAsRead 
+        markMessagesAsRead,
+        loadMoreMessages,
+        hasMoreMessages
     };
 }

@@ -15,15 +15,14 @@ class WsChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         """Подключение WebSocket"""
-
         self.channel_layer = get_channel_layer()  # Получение channel layer
         if self.channel_layer is None:
             raise ValueError("Channel layer is not configured properly.")
 
         self.conversation_id = self.scope['url_route']['kwargs']['conversation_id']
-        self.room_group_name = f"conversation_{self.conversation_id}"  # ✅ исправлено (было `room_{self.conversation_id}`)
+        self.room_group_name = f"conversation_{self.conversation_id}"
 
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # ✅ добавил `await`
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         # Получаем строку запроса (query string) и декодируем ее
         query_string = self.scope.get('query_string', b'').decode('utf-8')
@@ -42,16 +41,18 @@ class WsChatConsumer(AsyncWebsocketConsumer):
             self.user = await sync_to_async(User.objects.get)(id=user_id)
 
         except ExpiredSignatureError:
-            await self.send(
-                text_data=json.dumps({"error": "Token expired. Please log in again."}))  # ✅ исправлено (JSON-ответ)
+            await self.send(text_data=json.dumps({"error": "Token expired. Please log in again."}))
+            await asyncio.sleep(0.1)  # Даем время на отправку перед закрытием
             await self.close()
             return
+
 
         except (AuthenticationFailed, KeyError, User.DoesNotExist):
             raise AuthenticationFailed('Invalid token')
 
         # Подключение к группе
         await self.accept()
+        await self.load_initial_messages()
         print(f"✅ WebSocket подключен в комнату: {self.room_group_name} для пользователя {self.user}")
 
     async def disconnect(self, close_code):
@@ -69,8 +70,10 @@ class WsChatConsumer(AsyncWebsocketConsumer):
             await self.handle_send_message(data)
         elif action == "invite_user":
             await self.handle_invite_user(data)
-        elif action == "mark_as_read":  # ✅ Новый обработчик
+        elif action == "mark_as_read":
             await self.handle_mark_as_read(data)
+        elif action == "load_more_messages":
+            await self.handle_load_more_messages(data)
 
     async def handle_mark_as_read(self, data):
         """Пометка сообщений как прочитанных"""
@@ -82,7 +85,7 @@ class WsChatConsumer(AsyncWebsocketConsumer):
 
         # Получаем сообщения, которые не были прочитаны
         unread_messages = await (sync_to_async(list)
-                                 (MessageStatus.objects.filter(message__conversation_id=conversation_id,user=user, is_read=False)))
+                                 (MessageStatus.objects.filter(message__conversation_id=conversation_id, user=user, is_read=False)))
 
         if unread_messages:
             for msg_status in unread_messages:
@@ -146,7 +149,6 @@ class WsChatConsumer(AsyncWebsocketConsumer):
         }
         print("📤 Отправляем сообщение клиентам:", response)
 
-        # ✅ исправлено (теперь отправляется в `conversation_{conversation.id}`)
         await self.channel_layer.group_send(
             self.room_group_name,
             {"type": "chat_message", "message": response}
@@ -171,12 +173,83 @@ class WsChatConsumer(AsyncWebsocketConsumer):
                 },
             }
 
-            # ✅ исправлено (отправляем в комнату беседы)
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "chat_message", "message": response}
+                {"action": "chat_message", "message": response}
             )
+
+    async def load_initial_messages(self):
+        """Загрузка последних сообщений при подключении"""
+        conversation_id = self.conversation_id
+
+        # Загружаем последние 20 сообщений
+        last_messages = await sync_to_async(
+            lambda: list(
+                Message.objects.filter(conversation_id=conversation_id)
+                .order_by("-created_at")
+                .values("id", "conversation_id", "sender_id", "text", "created_at")[:20]
+            )
+        )()
+
+
+        # Переворачиваем в хронологический порядок
+        last_messages.reverse()
+
+        for msg in last_messages:
+            msg["created_at"] = msg["created_at"].isoformat()
+
+        # Отправляем данные клиенту
+        await self.send(text_data=json.dumps({
+            "action": "initial_messages",
+            "messages": last_messages
+        }, ensure_ascii=False))
+
+    async def handle_load_more_messages(self, data):
+        """Загрузка старых сообщений при скролле вверх"""
+        conversation_id = self.conversation_id
+        last_message_id = data.get("last_message_id")
+
+        if not conversation_id or not last_message_id:
+            return
+        # Получаем 20 более старых сообщений
+        print("WWWWW", last_message_id )
+        older_messages = await sync_to_async(
+            lambda: list(
+                Message.objects.filter(conversation_id=conversation_id, id__lt=last_message_id)
+                .order_by("-created_at")
+                .values("id", "conversation_id", "sender_id", "text", "created_at")[:20]
+            )
+        )()
+        print(f"Найдено старых сообщений: {len(older_messages)}")
+
+        if not older_messages:
+            # Когда нет старых сообщений
+            await self.send(text_data=json.dumps({
+                "action": "load_more_messages",
+                "messages": []  # Пустой массив
+            }))
+            return
+
+        # Подготовка данных для отправки
+        messages_data = [
+            {
+                "id": msg["id"],
+                "conversation_id": msg["conversation_id"],
+                "sender": msg["sender_id"],
+                "text": msg["text"],
+                "created_at": msg["created_at"].isoformat(),
+            }
+            for msg in older_messages
+        ]
+
+        # Отправка сообщений клиенту
+        await self.send(text_data=json.dumps({
+            "action": "load_more_messages",
+            "messages": messages_data
+        }))
 
     async def chat_message(self, event):
         """Отправка данных клиенту"""
+
+        print("SEND", event)
         await self.send(text_data=json.dumps(event["message"], ensure_ascii=False))

@@ -1,14 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useWebSocket } from "../../hooks/useWebSocket";
 
 
 export const ChatComponent = ({ roomId }: { roomId: number }) => {
-    const { isConnected, connectWebSocket, sendMessage, messages, invitations, markMessagesAsRead } = useWebSocket(roomId);
+    const { isConnected, connectWebSocket, sendMessage, messages,loadMoreMessages, hasMoreMessages, disconnectWebSocket, invitations, markMessagesAsRead } = useWebSocket(roomId);
+
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
-        connectWebSocket();
-        markMessagesAsRead(); // Отметить сообщения как прочитанные при подключении
-    }, [connectWebSocket, markMessagesAsRead]);
+        markMessagesAsRead(); 
+    }, [connectWebSocket]);
 
     return (
         <div>
@@ -16,6 +17,31 @@ export const ChatComponent = ({ roomId }: { roomId: number }) => {
             <div>
                 {isConnected ? "🟢 Онлайн" : "🔴 Оффлайн"}
             </div>
+            <div>
+            <button onClick={connectWebSocket} disabled={isConnected}>
+                {isConnected ? "Подключено" : "Подключиться"}
+            </button>
+            <button onClick={disconnectWebSocket} disabled={!isConnected}>
+                Отключиться
+            </button>
+            {isConnected&&
+            <div>
+                <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Введите сообщение"
+                />
+                <button
+                    onClick={() => {
+                        sendMessage(message);
+                        setMessage(""); // Очищаем поле ввода после отправки
+                    }}
+                    disabled={!isConnected || !message}
+                >Отправить
+                </button>
+            </div>}
+        </div>
 
             <div>
                 <h3>Сообщения:</h3>
@@ -25,6 +51,9 @@ export const ChatComponent = ({ roomId }: { roomId: number }) => {
                     </div>
                 ))}
             </div>
+            <button onClick={loadMoreMessages} disabled={!hasMoreMessages}>
+                Предыдущие сообщения
+            </button>
 
             <div>
                 <h3>Приглашения:</h3>
